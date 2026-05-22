@@ -61,3 +61,10 @@ To protect highly confidential corporate contracts, the architecture includes se
 - **Secure File Handling:** File uploads are limited to 10MB to prevent Denial of Service (DoS) attacks via resource exhaustion. The backend also utilizes Magic Byte validation (`filetype`) to ensure files are genuinely what they claim to be (e.g., a real PDF, not a disguised executable).
 - **Air-Gapped / Strict Local Mode:** Because third-party cloud LLMs pose data privacy risks for legal documents, the UI offers an "Air-Gapped Mode" toggle. When enabled, the platform completely disables the cloud LLM connection (Groq API) and relies 100% on the local SVM and TF-IDF models.
 - **Secure Ephemeral Storage:** Temporary files created during the pipeline are securely destroyed immediately after the extraction phase, ensuring no contract data lingers on the server disk.
+
+## 6. Authentication & Database (Supabase)
+**Tech Stack:** `supabase-js`, `supabase-py`, PostgreSQL
+Supabase acts as the centralized Identity Provider and persistent storage layer for the platform. Its usage is critical for the "Zero Trust" architecture:
+- **Frontend Session Management:** The React frontend utilizes `@supabase/supabase-js` to handle secure user authentication (login/registration) and maintain the user's active session.
+- **Persistent Playbooks (Database):** When a user uploads a custom law firm playbook, the generated JSON mapping is saved directly into a Supabase PostgreSQL table (`playbooks`) and tied strictly to their `user_id`. This allows the user's custom standards to persist across sessions automatically.
+- **Backend Authorization (JWT Verification):** The FastAPI backend uses the Supabase Python client (`supabase-py`) to intercept every incoming API request. It extracts the `Bearer` token sent by the frontend and verifies its cryptographic validity with the Supabase Auth server before allowing access to the machine learning pipeline.
