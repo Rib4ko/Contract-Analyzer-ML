@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Lock, Mail, KeyRound } from 'lucide-react';
 
-const Auth = ({ onLogin }) => {
+const Auth = ({ onLogin, onOfflineLogin }) => {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -87,6 +87,19 @@ const Auth = ({ onLogin }) => {
             >
               {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
             </button>
+          </div>
+          
+          <div className="mt-8 pt-6 border-t border-white/10 text-center">
+            <button 
+              type="button"
+              onClick={onOfflineLogin}
+              className="w-full relative overflow-hidden px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-background rounded-full font-sans font-bold transition-all hover:border-accent/50 flex items-center justify-center space-x-2"
+            >
+              <span>Work Offline (Air-Gapped Mode)</span>
+            </button>
+            <p className="mt-3 font-mono text-[10px] text-background/40">
+              Bypass cloud authentication and run entirely on your local machine.
+            </p>
           </div>
         </div>
       </div>

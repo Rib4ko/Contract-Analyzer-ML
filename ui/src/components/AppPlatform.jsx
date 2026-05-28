@@ -4,14 +4,14 @@ import gsap from 'gsap';
 
 import { supabase } from '../lib/supabase';
 
-const AppPlatform = ({ session }) => {
+const AppPlatform = ({ session, isOfflineMode }) => {
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
   const [savedPlaybook, setSavedPlaybook] = useState(null);
   const [status, setStatus] = useState('idle'); // idle, loading, complete, error
   const [results, setResults] = useState(null);
   const [loadingStep, setLoadingStep] = useState(0);
-  const [airGappedMode, setAirGappedMode] = useState(false);
+  const [airGappedMode, setAirGappedMode] = useState(isOfflineMode || false);
   const loadingTextRef = useRef(null);
 
   const loadingSteps = [
@@ -215,8 +215,8 @@ const AppPlatform = ({ session }) => {
                   <p className="font-mono text-[10px] text-background/50">Disables 3rd-party Cloud LLMs. 100% data privacy.</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" checked={airGappedMode} onChange={(e) => setAirGappedMode(e.target.checked)} />
-                  <div className="w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                  <input type="checkbox" className="sr-only peer" checked={airGappedMode} onChange={(e) => setAirGappedMode(e.target.checked)} disabled={isOfflineMode} />
+                  <div className={`w-11 h-6 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent ${isOfflineMode ? 'opacity-50 cursor-not-allowed' : ''}`}></div>
                 </label>
               </div>
 

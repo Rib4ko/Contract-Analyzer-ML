@@ -14,10 +14,19 @@ except Exception:
 security = HTTPBearer()
 
 async def verify_jwt(credentials: HTTPAuthorizationCredentials = Security(security)):
+    token = credentials.credentials
+    if token == "OFFLINE_MODE":
+        # Create a mock user object with dict-like access for offline usage
+        class MockUser:
+            pass
+        user = MockUser()
+        user.id = "offline-user"
+        user.email = "offline@local"
+        return user
+        
     if not supabase:
         raise HTTPException(status_code=500, detail="Supabase client not initialized")
     
-    token = credentials.credentials
     try:
         user_response = supabase.auth.get_user(token)
         if not user_response or not user_response.user:

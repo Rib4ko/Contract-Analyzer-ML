@@ -10,20 +10,26 @@ import { supabase } from './lib/supabase';
 
 function App() {
   const [session, setSession] = useState(null);
+  const [isOfflineMode, setIsOfflineMode] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    supabase.auth.getSession().then(({ data: { session: supabaseSession } }) => {
+      if (!isOfflineMode) setSession(supabaseSession);
     });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    } = supabase.auth.onAuthStateChange((_event, supabaseSession) => {
+      if (!isOfflineMode) setSession(supabaseSession);
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [isOfflineMode]);
+
+  const handleOfflineLogin = () => {
+    setIsOfflineMode(true);
+    setSession({ access_token: 'OFFLINE_MODE', user: { id: 'offline-user' } });
+  };
 
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden flex flex-col font-sans">
@@ -32,7 +38,7 @@ function App() {
         <Hero />
         <Features />
         <Philosophy />
-        {session ? <AppPlatform session={session} /> : <Auth onLogin={setSession} />}
+        {session ? <AppPlatform session={session} isOfflineMode={isOfflineMode} /> : <Auth onLogin={setSession} onOfflineLogin={handleOfflineLogin} />}
       </main>
       <Footer />
     </div>

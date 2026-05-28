@@ -1,0 +1,77 @@
+classDiagram
+    %% --- Entities (Data Classes) ---
+    class Clause {
+        +String text
+        +String category
+        +float confidence
+        +int page_number
+        +to_dict() dict
+    }
+
+    class QAResult {
+        +String question
+        +String answer
+        +float score
+        +String source
+    }
+
+    class DocumentAnalysis {
+        +String file_name
+        +List~Clause~ clauses
+        +Dict summary
+        +List~QAResult~ extracted_facts
+        +Dict playbook_deviations
+        +List~String~ undefined_terms
+        +to_dict() dict
+    }
+
+    %% --- Models ---
+    class RouterModel {
+        -String model_path
+        -String vectorizer_path
+        +classify(text: String) Clause
+        +load_models() void
+    }
+
+    class QAExtractor {
+        -String groq_api_key
+        +ask(question: String, context: String) QAResult
+        -_ask_with_groq(question, context) QAResult
+        -_ask_with_heuristics(question, context) QAResult
+    }
+
+    %% --- Features ---
+    class PlaybookSimilarityEngine {
+        -TfidfVectorizer vectorizer
+        +compare(clause_text: String, playbook_text: String) float
+        +find_deviation(clause: Clause, playbook_mapping: Dict) Dict
+    }
+
+    class DefinitionsChecker {
+        -Regex pattern
+        +find_defined_terms(text: String) List~String~
+        +find_capitalized_words(text: String) List~String~
+        +validate_definitions(contract_text: String) List~String~
+    }
+
+    %% --- Core Pipeline ---
+    class LegalDocumentAnalyzer {
+        -RouterModel router
+        -QAExtractor qa_extractor
+        -int minimum_words_per_clause
+        +analyze(file_path: Path, playbook_mapping: Dict, air_gapped: bool) DocumentAnalysis
+        -_extract_text(file_path: Path) String
+        -_process_clauses(text: String) List~Clause~
+    }
+
+    %% --- Relationships ---
+    LegalDocumentAnalyzer "1" *-- "1" RouterModel : utilise
+    LegalDocumentAnalyzer "1" *-- "1" QAExtractor : utilise
+    LegalDocumentAnalyzer "1" ..> "1" PlaybookSimilarityEngine : appelle
+    LegalDocumentAnalyzer "1" ..> "1" DefinitionsChecker : appelle
+    LegalDocumentAnalyzer "1" --> "1" DocumentAnalysis : génère
+
+    DocumentAnalysis "1" *-- "*" Clause : contient
+    DocumentAnalysis "1" *-- "*" QAResult : contient
+    RouterModel ..> Clause : retourne
+    QAExtractor ..> QAResult : retourne
