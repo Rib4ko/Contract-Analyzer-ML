@@ -4,7 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const Navbar = () => {
+const Navbar = ({ session, onLogout }) => {
   const navRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -36,14 +36,26 @@ const Navbar = () => {
           <a href="#platform" className="hover:-translate-y-[1px] transition-transform">App Platform</a>
         </div>
 
-        <button 
-          onClick={() => document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' })}
-          className={`relative overflow-hidden px-6 py-2 rounded-full font-sans text-sm font-semibold transition-transform hover:scale-105 active:scale-95 ${
-            isScrolled ? 'bg-primary text-background' : 'bg-background text-primary'
-          }`}
-        >
-          <span className="relative z-10">Upload Contract</span>
-        </button>
+        <div className="flex items-center space-x-4">
+          {session && (
+            <button 
+              onClick={onLogout}
+              className={`font-sans text-sm font-medium transition-colors hover:text-accent ${
+                isScrolled ? 'text-primary/70' : 'text-background/70'
+              }`}
+            >
+              Log Out
+            </button>
+          )}
+          <button 
+            onClick={() => document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' })}
+            className={`relative overflow-hidden px-6 py-2 rounded-full font-sans text-sm font-semibold transition-transform hover:scale-105 active:scale-95 ${
+              isScrolled ? 'bg-primary text-background' : 'bg-background text-primary'
+            }`}
+          >
+            <span className="relative z-10">{session ? 'Audit Dashboard' : 'Upload Contract'}</span>
+          </button>
+        </div>
       </nav>
     </div>
   );

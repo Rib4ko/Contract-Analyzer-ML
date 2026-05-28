@@ -31,9 +31,17 @@ function App() {
     setSession({ access_token: 'OFFLINE_MODE', user: { id: 'offline-user' } });
   };
 
+  const handleLogout = async () => {
+    if (!isOfflineMode) {
+      await supabase.auth.signOut();
+    }
+    setSession(null);
+    setIsOfflineMode(false);
+  };
+
   return (
     <div className="min-h-screen bg-background w-full overflow-x-hidden flex flex-col font-sans">
-      <Navbar />
+      <Navbar session={session} onLogout={handleLogout} />
       <main className="flex-grow flex flex-col w-full">
         <Hero />
         <Features />
