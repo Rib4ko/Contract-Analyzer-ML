@@ -24,7 +24,7 @@ const AppPlatform = ({ session, isOfflineMode }) => {
   ];
 
   useEffect(() => {
-    if (session?.user?.id) {
+    if (session?.user?.id && session.user.id !== 'offline-user') {
       supabase
         .from('playbooks')
         .select('mapping')
@@ -107,9 +107,13 @@ const AppPlatform = ({ session, isOfflineMode }) => {
       if (!res.ok) throw new Error("Failed to parse playbook");
       const mapping = await res.json();
       
-      if (session?.user?.id) {
-        await supabase.from('playbooks').delete().eq('user_id', session.user.id);
-        await supabase.from('playbooks').insert({ user_id: session.user.id, mapping });
+      if (session?.user?.id && session.user.id !== 'offline-user') {
+        try {
+          await supabase.from('playbooks').delete().eq('user_id', session.user.id);
+          await supabase.from('playbooks').insert({ user_id: session.user.id, mapping });
+        } catch (dbErr) {
+          console.warn('Failed to sync to Supabase:', dbErr);
+        }
       }
       
       setSavedPlaybook(mapping);

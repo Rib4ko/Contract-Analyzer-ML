@@ -129,7 +129,7 @@ class LegalDocumentAnalyzer:
 
         findings: list[ClauseAnalysis] = []
         undefined_by_normalized = {item.normalized_term: item for item in definitions_result.undefined_terms}
-        qa_questions = dict(qa_questions or _DEFAULT_QA_QUESTIONS)
+        qa_questions = dict(qa_questions if qa_questions is not None else _DEFAULT_QA_QUESTIONS)
 
         for paragraph in paragraphs:
             classification = self.router_model.classify(paragraph.text)
