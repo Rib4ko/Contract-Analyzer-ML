@@ -1,0 +1,23 @@
+name: CI Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Python Syntax Verification
+        run: |
+          python -m py_compile src/pipeline/analyzer.py src/models/router.py src/features/definitions_checker.py
